@@ -68,6 +68,7 @@
           $query = mysqli_query($conn, $sql);
           $result = mysqli_fetch_assoc($query);
           $_SESSION['id'] = $result['id'];
+          $_SESSION['username'] = $result['username'];
           header("Location: users.php?id=".$_SESSION['id']);
           
         }
@@ -80,7 +81,7 @@
      ?>
     <div class="header">
      <div class="brand">
-    <h1>Chatter <i class="fa-regular fa-comments"></i></h1>
+        <h1>Chatter <i class="fa-regular fa-comments"></i></h1>
      </div>
         <h2>Sign up</h2>
     </div>
@@ -102,7 +103,8 @@
       <input type="file" name="profile_photo" accept="image/*" required>
       <?php echo $errors['image']?>
       <br><br>
-      <input type="checkbox" id="password">See password
+<!--      <input type="checkbox" id="password">See password-->
+      <i class="fa-solid fa-eye" id="password"></i> See password
       <br><br>
       <input type="submit" name="SignUpSubmit" class="btn">
         <p>Already have an account? <a href="login.php">Login in here</a></p>
@@ -111,13 +113,28 @@
     <script>
     let password = document.querySelector("#password");
     let passwordInput = document.querySelector("#passwordInput")
-    password.addEventListener("change", ()=>{
-      if (password.checked){
-        passwordInput.type = "text"
-      }
-      else {
-        passwordInput.type = "password";
-      }
+    isChecked = false;
+    // password.addEventListener("change", ()=>{
+    //   if (password.checked){
+    //     passwordInput.type = "text"
+    //   }
+    //   else {
+    //     passwordInput.type = "password";
+    //   }
+    // })
+    password.addEventListener("click", function (){
+        isChecked = !isChecked;
+
+        if (isChecked){
+            password.classList.remove("fa-eye");
+            password.classList.add("fa-eye-slash");
+            passwordInput.type = "text"
+        }
+        else {
+            password.classList.remove("fa-eye-slash");
+            password.classList.add("fa-eye");
+            passwordInput.type = "password"
+        }
     })
     </script>
   </body>

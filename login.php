@@ -32,6 +32,7 @@ if (isset($_POST['loginSubmit'])){
             session_start();
             $result = mysqli_fetch_assoc($query);
             $_SESSION['id'] = $result['id'];
+            $_SESSION['username'] = $result['username'];
             header("Location: users.php?id=".$_SESSION['id']);
         }
     }

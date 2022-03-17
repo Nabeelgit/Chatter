@@ -46,3 +46,18 @@ body {
 a{
     cursor: pointer;
 }
+.user-data{
+    display: block;
+    text-align: -webkit-center;
+}
+.display-none{
+    display: none;
+}
+.editA {
+    text-decoration: none;
+    color: #FFFFFF;
+}
+.editA:hover{
+    text-decoration: none;
+    color: #FFFFFF;
+}

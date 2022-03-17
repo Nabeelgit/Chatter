@@ -61,3 +61,6 @@ a{
     text-decoration: none;
     color: #FFFFFF;
 }
+textarea {
+    resize: none !important;
+}

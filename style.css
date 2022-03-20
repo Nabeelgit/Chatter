@@ -25,7 +25,7 @@ body {
     border: 1px solid #0077CC;
     border-radius: 4px;
     box-sizing: border-box;
-    color: #FFFFFF;
+    color: #FFFFFF !important;
     cursor: pointer;
     direction: ltr;
     display: block;
@@ -63,4 +63,8 @@ a{
 }
 textarea {
     resize: none !important;
+}
+.group-link {
+    color: #42A1EC !important;
+    text-decoration: underline !important;
 }

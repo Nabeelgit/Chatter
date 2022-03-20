@@ -82,10 +82,13 @@ function isUserAccount(){
                 <a class="nav-link" href="users.php?id=<?php echo $info['id']?>">Search for users <i class="fa-solid fa-magnifying-glass"></i></a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link">View your account  <i class="fa-solid fa-user"></i></a>
+                <a class="nav-link">View your account  <i class="fa-solid fa-circle-user"></i></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="recent.php?id=<?php echo $info['id']?>">Recent chats <i class="fa-regular fa-comment"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="groupchats.php?id=<?php echo $info['id']?>">Groupchat(beta) <i class="fa-solid fa-users"></i></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="login.php">Logout <i class="fa-solid fa-arrow-right-from-bracket"></i></a>

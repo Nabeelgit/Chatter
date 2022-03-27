@@ -68,3 +68,6 @@ textarea {
     color: #42A1EC !important;
     text-decoration: underline !important;
 }
+#UserSearch {
+    width: 300px !important;
+}

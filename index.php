@@ -28,10 +28,15 @@
         return false;
       }
     }
+    function removeSpace($string){
+        return preg_replace('/\s+/', '', $string);
+    }
     $errors = ['name'=>'', 'username'=>'', 'password'=>'','image'=>''];
     if (isset($_POST['SignUpSubmit'])) {
-      $name = htmlspecialchars($_POST['name']);
-      $username = htmlspecialchars($_POST['username']);
+      $spacename = htmlspecialchars($_POST['name']);
+      $name = removeSpace($spacename);
+      $spaceusername = htmlspecialchars($_POST['username']);
+      $username = removeSpace($spaceusername);
       $password = htmlspecialchars($_POST['password']);
       $photo =[];
       if($_FILES['profile_photo']['size'] != 0 && $_FILES['profile_photo']['error'] == 0){
@@ -61,10 +66,10 @@
         session_start();
         $_SESSION['name'] = $name;
         $_SESSION['username'] = $username;
-        $sql = "INSERT INTO users(name, username, password, profile_photo) VALUES('$name', '$username', '$password', '$photo[0]')";
+        $sql = "INSERT INTO users(name, username, password, profile_photo) VALUES('$spacename', '$spaceusername', '$password', '$photo[0]')";
         if (mysqli_query($conn, $sql)){
           // success
-          $sql = "SELECT * FROM users WHERE username = '$username'";
+          $sql = "SELECT * FROM users WHERE username = '$spaceusername'";
           $query = mysqli_query($conn, $sql);
           $result = mysqli_fetch_assoc($query);
           $_SESSION['id'] = $result['id'];

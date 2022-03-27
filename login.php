@@ -50,7 +50,7 @@ if (isset($_POST['loginSubmit'])){
     <div class="red-text"><?php echo  $errors['username']?></div>
     <br><br>
     <label>Password</label>
-    <input type="text" name="loginPassword" placeholder="Enter your password">
+    <input type="password" name="loginPassword" placeholder="Enter your password">
     <br>
     <div class="red-text"><?php echo $errors['password'] ?></div>
     <br><br>

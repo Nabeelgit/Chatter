@@ -24,7 +24,8 @@ if (isset($_GET['id']) || isset($_SESSION['id'])){
     $info['id'] = $result['id'];
     $info['username'] = $result['username'];
 } else {
-    echo "An error occurred";
+    echo "An error occurred please try again later";
+    exit;
 }
 function isUserReciever($id){
     global $conn;
@@ -57,10 +58,60 @@ function getAllGroupChats(){
     global $conn;
     global $info;
     $id = $info['id'];
-    $sql = "SELECT * FROM groupchat WHERE sender_id = '$id'";
+    $sql = "SELECT * FROM groupchat WHERE sender_id = '$id' LIMIT 1";
     $query = mysqli_query($conn, $sql);
     $result = mysqli_fetch_all($query, MYSQLI_ASSOC);
     return $result;
+}
+function UniqueIdTaken($id){
+    global $conn;
+    $sql = "SELECT * FROM groupchats WHERE unique_id = '$id'";
+    $query = mysqli_query($conn, $sql);
+    if (mysqli_num_rows($query) > 0){
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+function getUniqueId(){
+    $stack = [0];
+    $alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    $symbols = ['-', '_'];
+    for ($i = 0; $i < 5; $i++){
+        $int = rand(0, 64);
+        $index = rand(0, (count($alphabet) - 1));
+        $sym = rand(0, 1);
+        $id = [];
+        if ($int < 32){
+            if ($index > 13){
+                $id[0] = $symbols[$sym].strtolower($alphabet[$index]).$int.uniqid();
+            }
+            else {
+                $id[0] = strtolower($alphabet[$index]).$int.uniqid();
+            }
+        }
+        else {
+            if ($index > 45){
+                $id[0] = $symbols[$sym].$alphabet[$index].$int.uniqid();
+            }
+            else {
+                $id[0] = $alphabet[$index].$int.uniqid();
+            }
+        }
+    }
+    if (UniqueIdTaken($id[0])){
+        $stack[0] += 1;
+        if ($stack[0] < 15) {
+            getUniqueId();
+        } else {
+            echo "There was an error while generating an Id please try again or contact an admin";
+            exit;
+        }
+    }
+    else {
+        return $id[0];
+    }
 }
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -89,7 +140,8 @@ function getAllGroupChats(){
     </div>
 </nav>
 <br>
-<a class="btn" href="create-groupchat.php?id=<?php echo $info['id']?>">Create a groupchat</a>
+<a class="btn" href="create-groupchat.php?id=<?php echo $info['id']?>&token=<?php echo getUniqueId()?>">Create a groupchat</a>
+<!--PASS USER ID AND UNIQUE ID-->
 <h1>Recent groupchats for <?php echo $info['username']?></h1>
 <?php
 $id = $info['id'];

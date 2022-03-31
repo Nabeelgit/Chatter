@@ -37,7 +37,6 @@ body {
     min-width: 30px;
     overflow: visible;
     text-align: center;
-    vertical-align: baseline;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
@@ -70,4 +69,26 @@ textarea {
 }
 #UserSearch {
     width: 300px !important;
+}
+.modal {
+    position: absolute;
+    top: 30%;
+    left: 45%;
+    z-index: 1;
+    text-align: center;
+    border: solid;
+    width: 260px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+}
+.modal .modal-nav{
+    background-color: #42A1EC;
+    margin: 0 auto;
+    position: relative;
+}
+.modal .modal-text{
+    left: 30 !important;
+}
+.modal .modal-name{
+    width: 190px;
 }

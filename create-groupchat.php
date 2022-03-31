@@ -12,6 +12,7 @@ function uniqueIdTaken($id){
         return false;
     }
 }
+$styles = ['created'=>false];
 $info = ['id'=>'', 'username'=>'', 'token'=>''];
 if ((isset($_GET['id']) || isset($_SESSION['id'])) && isset($_GET['token'])){
 $rawid = $_GET['id'] ?? $_SESSION['id'];
@@ -23,8 +24,20 @@ $token = mysqli_real_escape_string($conn, htmlspecialchars($_GET['token']));
 $info['token'] = $token;
 if (!uniqueIdTaken($token)){
     $sql = "INSERT INTO groupchats(founder, unique_id) VALUES('$username', '$token')";
-    if (mysqli_query($conn, $sql[0])){
-
+    if (mysqli_query($conn, $sql)){
+        $sel = "SELECT * FROM groupchats WHERE unique_id = '$token'";
+        $query = mysqli_query($conn, $sel);
+        $result = mysqli_fetch_assoc($query);
+        $setMembers = [$result['members']];
+        if ($setMembers[0] == "None"){
+            $upd = "UPDATE groupchats SET members = '' WHERE unique_id = '$token'";
+            if (mysqli_query($conn, $upd)){
+    
+            }
+            else {
+                connectionError();
+            }
+        }
     }
     else {
         echo "There was an error connecting to the server... Please try again later";
@@ -72,6 +85,8 @@ function connectionError(){
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Create a groupchat</title>
 </head>
 <body>
@@ -79,7 +94,7 @@ function connectionError(){
     <fieldset>
         <legend>Search for users</legend>
         <input type="text" name="search">
-        <input type="submit" name="searchSubmit" title="Search">
+        <input type="submit" name="searchSubmit" title="Search" id="search">
     </fieldset>
 
 </form>
@@ -99,30 +114,27 @@ if (isset($_POST['searchSubmit'])){
     }
 }
 foreach ($result as $user):
+$usernames = $user['username'] ?? $user;
+if ($usernames == getUsernameById($info['id'])){
+    echo "";
+}
+else {
 ?>
 <form action="<?php echo $_SERVER['REQUEST_URI']?>" method="POST">
 <input type="text" name="member"  value="<?php echo $user['username'] ?? $user?>" readonly>
-<button type="submit" name="userAdd" title="Add user"><i class="fa-solid fa-user-plus"></i></button>
+<button type="submit" name="userAdd" title="Add user" id="userAdd"><i class="fa-solid fa-user-plus"></i></button>
 </form>
-<?php endforeach;?>
+<?php
+}
+endforeach;?>
 <?php
 if (isset($_POST['userAdd'])) {
     $token = $info['token'];
     $founder = $info['username'];
-    $member = htmlspecialchars($_POST['member']);
     $sel = "SELECT * FROM groupchats WHERE unique_id = '$token'";
     $query = mysqli_query($conn, $sel);
     $result = mysqli_fetch_assoc($query);
-    $setMembers = [$result['members']];
-    if ($setMembers[0] == "None"){
-        $upd = "UPDATE groupchats SET members = '' WHERE unique_id = '$token'";
-        if (mysqli_query($conn, $upd)){
-
-        }
-        else {
-            connectionError();
-        }
-    }
+    $member = htmlspecialchars($_POST['member']);
     $new = $result['members'].$member.",";
     $sql = "UPDATE groupchats SET members  = '$new' WHERE unique_id = '$token'";
     if (mysqli_query($conn, $sql)){
@@ -133,6 +145,62 @@ if (isset($_POST['userAdd'])) {
     }
 }
 ?>
+<button id="createBtn" class="btn">Create groupchat</button>
+
 </div>
+<div class="display-none" id="modal">
+    <h4 class="modal-nav">Final step</h4>
+    <p class="modal-text">Add a name for your groupchat</p>
+        <button id="closeFinal">X</button>
+        <br><br>
+        <input type="text" placeholder="Enter a name for your groupchat" class="modal-name" id="groupname">
+        <button id="finalCreate">Create</button>
+        <div id="success">
+            
+        </div>
+    <p>Members: <span id="members"></span></p>
+</div>
+<script>
+    var token = "<?php echo $info['token']?>";
+    function changeAllBtn(bool){
+        $("#createBtn").prop("disabled", bool);
+        $("#userAdd").prop("disabled", bool);
+        $("#search").prop("disabled", bool);
+    }
+    var modal = $("#modal");
+    $("#createBtn").click(function(){
+        modal.removeClass("display-none");
+        modal.addClass("modal");
+        changeAllBtn(true)
+        $.post("./handleGroupCreate.php", {token: token}, function(data){
+            $("#members").html(data);
+        })
+    });
+    $("#closeFinal").click(function(){
+        modal.removeClass("modal");
+        modal.addClass("display-none");
+        changeAllBtn(false)
+    })
+    $("#finalCreate").click(function(){
+        var groupname = $("#groupname").val();
+        let newStr = groupname.replace(/\s+/g, '');
+        if (newStr == ""){
+            $("#success").html("Name can't be blank")
+        }
+        else {
+            $("#success").html("");
+            $.post("./handleGroupCreate.php", {token: token, groupname: groupname}, function(data){
+                $("#success").html(data)
+                modal.removeClass("modal");
+                modal.addClass("display-none");
+                $.post("./handleGroupCreate.php", {created: "true", user_id: <?php echo $info['id']?>}, function(data){
+                    if (data == "done"){
+                        window.location.assign("groupchats.php?id=<?php echo $info['id']?>")
+                    }
+                })
+            })
+        }
+    })
+</script>
 </body>
 </html>

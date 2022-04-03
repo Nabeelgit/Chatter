@@ -11,6 +11,10 @@
     -moz-box-shadow: 0 4px 4px -2px #232323;
     -webkit-box-shadow: 0 4px 4px -2px #232323;
 }
+.formReplica {
+    display: block;
+    margin-top: 0em;
+}
 body {
     background-color: #fff;
 }
@@ -91,4 +95,8 @@ textarea {
 }
 .modal .modal-name{
     width: 190px;
+}
+.groupchat-link {
+    font-size: 20px;
+    text-decoration: underline;
 }

@@ -40,6 +40,23 @@ function isUserReciever($id){
 		return false;
 	}
 }
+function getIdByUsername($username){
+    global $conn;
+    $sql = "SELECT id FROM users WHERE username = '$username'";
+    $query = mysqli_query($conn, $sql);
+    $result = mysqli_fetch_assoc($query);
+    return $result['id'] ?? $result;
+}
+function getRecieverIdFromName($recieversArr){
+    $arr = [];
+    for ($k = 0; $k < count($recieversArr); $k++){
+        array_push($arr, getIdByUsername($recieversArr[$k]));
+        if ($arr[$k] == NULL){
+            array_pop($arr);
+        }
+    }
+    return $arr;
+} 
 function getUsernameById($id){
     global $conn;
     $sql = "SELECT * FROM users WHERE id = '$id'";
@@ -58,10 +75,18 @@ function getAllGroupChats(){
     global $conn;
     global $info;
     $id = $info['id'];
-    $sql = "SELECT * FROM groupchat WHERE sender_id = '$id' LIMIT 1";
+    $username = getUsernameById($id);
+    $sql = "SELECT * FROM groupchats WHERE founder = '$username' OR members LIKE '%$username%'";
     $query = mysqli_query($conn, $sql);
     $result = mysqli_fetch_all($query, MYSQLI_ASSOC);
-    return $result;
+    $arr = [];
+    for ($c = 0; $c < count($result); $c++){
+        array_push($arr, $result[$c]);
+        if ($result[$c]['members'] == "None" || $result[$c]['members'] == "" || $result[$c]['name'] == "None"){
+            array_pop($arr);
+        }
+    }
+    return $arr;
 }
 function UniqueIdTaken($id){
     global $conn;
@@ -145,13 +170,16 @@ function getUniqueId(){
 <h1>Recent groupchats for <?php echo $info['username']?></h1>
 <?php
 $id = $info['id'];
-$rec = getAllGroupChats();
-foreach($rec as $allRecievers):
-    $groupid = $allRecievers['id']." ";
+$allGroups = getAllGroupChats();
+for($i = 0; $i < count($allGroups); $i++):
+    $each = explode(",", $allGroups[$i]['members']);
+    // var_dump($each);
+    $recievers = getIdByUsername($each[$i]);
+    // var_dump($recievers);
+    $recieversId = getRecieverIdFromName($each);
+    // var_dump($recieversId)
 ?>
-    <a class="group-link" href="groupchat.php?id=<?php echo $info['id']?>&recievers_id=<?php echo $allRecievers['recievers_id']?>"><?php echo getGroupChatName($groupid)?></a>
-    <!--GIVE ID AND RECIEVERS ID-->
-    <br>
-<?php endforeach; ?>
+<a href="groupchat.php?id=<?php echo $id?>&recievers_id=<?php echo implode(",", $recieversId)?>&group_id=<?php echo $allGroups[$i]['unique_id']?>" style="font-size: 20px; text-decoration: underline;"><?php echo $allGroups[$i]['name']?></a>
+<?php endfor;?>
 </body>
 </html>

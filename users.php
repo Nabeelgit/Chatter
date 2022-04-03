@@ -10,31 +10,9 @@ if (isset($_GET['id']) || isset($_SESSION['id'])){
 else {
 	header("Location: index.php");
 }
-function returnUsername($id) {
-	global $conn;
-	$sql = "SELECT * FROM users WHERE id = '$id'";
-	$query = mysqli_query($conn, $sql);
-	$res = mysqli_fetch_assoc($query);
-	return $res['username'];
+if (!isset($_SESSION['id'])){
+    header("Location: index.php");
 }
-$result = ['username'=>''];
-if (isset($_POST['userSearchSubmit'])){
-	$search = htmlspecialchars($_POST['userSearch']);
-	if (empty($search)){
-
-	}
-	else {
-		$currentUser = returnUsername($info['id']);
-		$sql = "SELECT username, id FROM users WHERE username LIKE '$search%'";
-		$query = mysqli_query($conn, $sql);
-		$result = mysqli_fetch_all($query, MYSQLI_ASSOC);
-        if (mysqli_num_rows($query) <= 0){
-            echo "No users found"."<br/>";
-        }
-	}
-}
-
-
 
 ?>
 
@@ -47,9 +25,7 @@ if (isset($_POST['userSearchSubmit'])){
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" integrity="sha512-10/jx2EXwxxWqCLX/hHth/vu2KY3jCF70dCQB8TSgNjbCVAC/8vai53GfMDrO2Emgwccf2pJqxct9ehpzG+MTw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous" defer></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -78,29 +54,37 @@ if (isset($_POST['userSearchSubmit'])){
     </div>
 </nav>
     <br>
-	<form action="users.php" method="POST">
 		<label>Search for users</label>
-		<input type="text" name="userSearch">
-		<button name="userSearchSubmit" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-	</form>
-	<div>
-		<!-- Result of user search -->
-		<?php foreach($result as $usernames): ?>
-        <?php
-            $currentUser = returnUsername($info['id']);
-            $user = $usernames['username'] ?? $usernames;
-            if ($user == $currentUser){
-            echo  "";
-            } else {?>
-		<a href="account.php?user_id=<?php echo $usernames['id']?>"><?php $user = $usernames['username'] ?? $usernames;
-            echo $user;
-        ?></a>
-        -
-		<a href="chat.php?id=<?php echo $info['id'] ?>&reciever_id=<?php echo $usernames['id'] ?>"><i class="fa-solid fa-message"></i></a>
-        <br>
-        <?php }?>
-		<?php endforeach; ?>
+		<input type="text" name="userSearch" id="userInput">
+		<button name="userSearchSubmit" id="userSearch"><i class="fa-solid fa-magnifying-glass"></i></button>
+	<div id="userResult">
+
 
 	</div>
+    <script>
+        let userResult = $("#userResult");
+        let userId = "<?php echo $info['id']?>";
+        $("#userInput").keyup(function(){
+            let search = $("#userInput").val();
+            if (search.length >= 2){
+                $.post("./handleUserSearch.php", {search: search, id: userId}, function(data){
+                    userResult.html(data);
+                })
+            } else {
+                userResult.html("");
+            }
+        })
+        $("#userSearch").click(function(){
+            let search = $("#userInput").val();
+            let checked = search.replace(/\s/g, search);
+            if (checked == ""){
+                userResult.html("");
+            } else {
+                $.post("./handleUserSearch.php", {clickSearch: search, user_id: userId}, function(data){
+                    userResult.html(data);
+                })
+            }
+        })
+    </script>
 </body>
 </html>

@@ -79,6 +79,6 @@ ALTER TABLE `groupchats`
   mysqli_connect("localhost", "your username from phpmyadmin", "your password from phpmyadmin", "chatter1");
   now you have succesfully cloned chatter
   
-  to open it open xampp and start apache and mysql. Click admin next to apache and paste this url http://localhost/chatter1/. If something did'nt work please contact me at <b>nabeel30march@gmail.com</b>
+  to open it open xampp and start apache and mysql. Click admin next to apache and paste this url http://localhost/chatter1/.
   
 
